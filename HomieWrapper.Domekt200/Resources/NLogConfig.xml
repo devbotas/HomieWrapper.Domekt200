@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      autoReload="true"
+      throwExceptions="false"
+      internalLogLevel="Off">
+
+	<!-- !!LogsFolderTag!! will be replaced programmatically. -->
+	<variable name="LogsFolder" value="!LogsFolderTag!"/>
+
+	<targets>
+		<target name="logFile" maxArchiveFiles="30" archiveNumbering="Date" archiveEvery="Month" xsi:type="File" fileName="${LogsFolder}/ApplicationLog.txt" archiveFileName="${LogsFolder}/ApplicationLog.{#}.txt" archiveDateFormat="yyyy-MM"
+                layout="${longdate} ${uppercase:${level}} [${logger}] ${message} ${exception:format=ToString}"/>
+		<!-- This will print logs to visual studio output window. -->
+		<target xsi:type="Debugger" name="debugger" layout="${longdate} ${uppercase:${level}} [${logger}] ${message} ${exception}"/>
+	</targets>
+
+	<rules>
+		<!-- Filtering loggers from this app namespace only. Otherwise, logs from third party nugets may be catched. For example, RavenDb uses NLog too. -->
+		<!-- Warning! "Log" is appended after namespace so that it would still work after obfuscation. -->
+		<logger name="ShedMonitor.*" minlevel="Debug" writeTo="logFile" />
+		<logger name="ShedMonitor.*" minlevel="Debug" writeTo="debugger" />
+	</rules>
+</nlog>
