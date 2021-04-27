@@ -1,4 +1,4 @@
-﻿namespace HomieWrapper.Domekt200 {
+﻿namespace HomieWrapper {
     enum KomfoventRegisters : ushort {
         // These are all -1'ed, because that's how Modbus works...
 

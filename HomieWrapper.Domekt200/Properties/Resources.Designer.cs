@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace HomieWrapper.Domekt200.Properties {
+namespace HomieWrapper.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace HomieWrapper.Domekt200.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HomieWrapper.Domekt200.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HomieWrapper.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -68,11 +68,11 @@ namespace HomieWrapper.Domekt200.Properties {
         ///      throwExceptions=&quot;false&quot;
         ///      internalLogLevel=&quot;Off&quot;&gt;
         ///
-        ///	&lt;!-- !!LogsFolderTag!! will be replaced programmatically. --&gt;
-        ///	&lt;variable name=&quot;LogsFolder&quot; value=&quot;!LogsFolderTag!&quot;/&gt;
+        ///  &lt;!-- !!LogsFolderTag!! will be replaced programmatically. --&gt;
+        ///  &lt;variable name=&quot;LogsFolder&quot; value=&quot;!LogsFolderTag!&quot;/&gt;
         ///
-        ///	&lt;targets&gt;
-        ///		&lt;target name=&quot;logFile&quot; maxArchiveFiles=&quot;30&quot; archiveNumbering=&quot;Date&quot; archiveEvery=&quot;Month&quot; xsi:type=&quot;File&quot; fileName=&quot;${LogsFolder}/Applica [rest of string was truncated]&quot;;.
+        ///  &lt;targets&gt;
+        ///    &lt;target name=&quot;logFile&quot; maxArchiveFiles=&quot;30&quot; archiveNumbering=&quot;Date&quot; archiveEvery=&quot;Month&quot; xsi:type=&quot;File&quot; fileName=&quot;${LogsFolder}/Ap [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NLogConfig {
             get {

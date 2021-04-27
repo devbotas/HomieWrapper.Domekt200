@@ -10,7 +10,7 @@ using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using NLog;
 
-namespace HomieWrapper.Domekt200 {
+namespace HomieWrapper {
     class Domekt200 {
         private HostDevice _device;
 
@@ -28,7 +28,7 @@ namespace HomieWrapper.Domekt200 {
         private DateTime _startTime = DateTime.Now;
         private HostFloatProperty _systemUptime;
 
-        public static Logger Log = LogManager.GetLogger("ShedMonitor.Domekt200");
+        public static Logger Log = LogManager.GetLogger("HomieWrapper.Domekt200");
 
         public Domekt200() {
 
