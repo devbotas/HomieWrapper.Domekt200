@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,6 +6,9 @@
     <RootNamespace>HomieWrapper.Domekt200</RootNamespace>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <AssemblyName>HomieWrapper.Domekt200</AssemblyName>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
