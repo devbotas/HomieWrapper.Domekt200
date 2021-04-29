@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AMWD.Modbus.Tcp.Client;
 using DevBot9.Protocols.Homie;
 
 namespace HomieWrapper {
     partial class Domekt200 {
-        public void Initialize(ReliableBroker reliableBroker, string domektIpAddress) {
+        public void Initialize(ReliableBroker reliableBroker, ReliableModbus reliableModbus) {
             _reliableBroker = reliableBroker;
-
-            _modbus = new ModbusClient(domektIpAddress, 502);
-
-            Log.Info($"Connecting to Modbus device at {domektIpAddress}.");
-            _modbus.Connect().Wait();
+            _reliableModbus = reliableModbus;
 
             Log.Info($"Creating Homie properties.");
             _device = DeviceFactory.CreateHostDevice("recuperator", "Domekt 200");
@@ -25,47 +20,47 @@ namespace HomieWrapper {
             _targetState.PropertyChanged += (sender, e) => {
                 switch (_targetState.Value) {
                     case "OFF":
-                        TryWriteModbusRegister(KomfoventRegisters.StartStop, 0);
+                        _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.StartStop, 0);
                         break;
 
                     case "ON-AUTO":
                         if (_actualState.Value == "OFF") {
-                            TryWriteModbusRegister(KomfoventRegisters.StartStop, 1);
+                            _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.StartStop, 1);
                             Thread.Sleep(100);
                         }
-                        TryWriteModbusRegister(KomfoventRegisters.ModeAutoManual, 1);
+                        _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.ModeAutoManual, 1);
 
                         break;
 
                     case "ON-LOW":
                         if (_actualState.Value == "OFF") {
-                            TryWriteModbusRegister(KomfoventRegisters.StartStop, 1);
+                            _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.StartStop, 1);
                             Thread.Sleep(100);
                         }
 
-                        TryWriteModbusRegister(KomfoventRegisters.ModeAutoManual, 0);
+                        _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.ModeAutoManual, 0);
                         Thread.Sleep(100);
-                        TryWriteModbusRegister(KomfoventRegisters.VentilationLevelManual, 1);
+                        _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.VentilationLevelManual, 1);
                         break;
 
                     case "ON-MEDIUM":
                         if (_actualState.Value == "OFF") {
-                            TryWriteModbusRegister(KomfoventRegisters.StartStop, 1);
+                            _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.StartStop, 1);
                             Thread.Sleep(100);
                         }
-                        TryWriteModbusRegister(KomfoventRegisters.ModeAutoManual, 0);
+                        _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.ModeAutoManual, 0);
                         Thread.Sleep(100);
-                        TryWriteModbusRegister(KomfoventRegisters.VentilationLevelManual, 2);
+                        _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.VentilationLevelManual, 2);
                         break;
 
                     case "ON-HIGH":
                         if (_actualState.Value == "OFF") {
-                            TryWriteModbusRegister(KomfoventRegisters.StartStop, 1);
+                            _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.StartStop, 1);
                             Thread.Sleep(100);
                         }
-                        TryWriteModbusRegister(KomfoventRegisters.ModeAutoManual, 0);
+                        _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.ModeAutoManual, 0);
                         Thread.Sleep(100);
-                        TryWriteModbusRegister(KomfoventRegisters.VentilationLevelManual, 3);
+                        _reliableModbus.TryWriteModbusRegister(KomfoventRegisters.VentilationLevelManual, 3);
                         break;
                 }
             };

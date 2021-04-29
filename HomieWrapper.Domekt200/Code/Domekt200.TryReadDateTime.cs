@@ -5,15 +5,15 @@ namespace HomieWrapper {
         private bool TryReadDateTime(out DateTime dateTime) {
             var succeeded = false;
 
-            TryReadModbusRegister(KomfoventRegisters.HourAndMinute, out var hourAndMinute);
+            _reliableModbus.TryReadModbusRegister(KomfoventRegisters.HourAndMinute, out var hourAndMinute);
             var hour = hourAndMinute >> 8;
             var minute = hourAndMinute & 0xF;
 
-            TryReadModbusRegister(KomfoventRegisters.MonthAndDay, out var monthAndDay);
+            _reliableModbus.TryReadModbusRegister(KomfoventRegisters.MonthAndDay, out var monthAndDay);
             var month = monthAndDay >> 8;
             var day = monthAndDay & 0xFF;
 
-            TryReadModbusRegister(KomfoventRegisters.Year, out var year);
+            _reliableModbus.TryReadModbusRegister(KomfoventRegisters.Year, out var year);
 
             try {
                 dateTime = new DateTime(year, month, day, hour, minute, 0);

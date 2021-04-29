@@ -1,5 +1,4 @@
 ﻿using System;
-using AMWD.Modbus.Tcp.Client;
 using DevBot9.Protocols.Homie;
 using NLog;
 
@@ -8,9 +7,8 @@ namespace HomieWrapper {
         private HostDevice _device;
 
         private ReliableBroker _reliableBroker;
+        private ReliableModbus _reliableModbus;
 
-        ModbusClient _modbus;
-        private object _modbusLock = new object();
         HostStringProperty _actualDateTimeProperty;
         HostEnumProperty _actualState;
         HostEnumProperty _targetState;

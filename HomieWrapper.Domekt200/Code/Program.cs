@@ -10,6 +10,7 @@ namespace HomieWrapper {
     class Program {
         private static Domekt200 _recuperator = new Domekt200();
         private static ReliableBroker _reliableBroker = new ReliableBroker();
+        private static ReliableModbus _reliableModbus = new ReliableModbus();
 
         public static Logger Log = LogManager.GetLogger("HomieWrapper.Main");
         static void Main(string[] args) {
@@ -35,7 +36,8 @@ namespace HomieWrapper {
             Log.Info("Application started.");
             DeviceFactory.Initialize("homie");
             _reliableBroker.Initialize(brokerIp);
-            _recuperator.Initialize(_reliableBroker, domektIp);
+            _reliableModbus.Initialize(domektIp);
+            _recuperator.Initialize(_reliableBroker, _reliableModbus);
 
             Console.ReadLine();
         }
