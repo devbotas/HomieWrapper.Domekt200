@@ -1,9 +1,5 @@
-﻿using System;
-
-namespace SharpModbus
-{
-    public interface IModbusModel
-    {
+﻿namespace SharpModbus {
+    public interface IModbusModel {
         void setDI(byte slave, ushort address, bool value);
 
         void setDIs(byte slave, ushort address, bool[] values);

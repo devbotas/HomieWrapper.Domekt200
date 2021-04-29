@@ -1,10 +1,5 @@
-﻿
-using System;
-
-namespace SharpModbus
-{
-    public interface IModbusCommand
-    {
+﻿namespace SharpModbus {
+    public interface IModbusCommand {
         byte Code { get; }
         byte Slave { get; }
         ushort Address { get; }
