@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using AMWD.Modbus.Tcp.Client;
 using NLog;
 
 
@@ -18,14 +16,6 @@ namespace HomieWrapper {
 
             _deviceIp = modbusDeviceIpAddress;
 
-            _modbus = new ModbusClient(_deviceIp, 502);
-            _modbus.MaxConnectTimeout = TimeSpan.FromSeconds(2);
-            _modbus.ReconnectTimeSpan = TimeSpan.FromSeconds(2);
-            _modbus.Disconnected += (sender, e) => {
-                IsConnected = false;
-                _log.Error("AMWD library reports ModBus disconnection.");
-            };
-
             Task.Run(async () => await MonitorConnectionContinuously(_globalCancellationTokenSource.Token));
 
             IsInitialized = true;
@@ -35,7 +25,6 @@ namespace HomieWrapper {
                 if (IsConnected == false) {
                     try {
                         _log.Info($"Connecting to Modbus device at {_deviceIp}.");
-                        _modbus.Connect().Wait();
 
                         IsConnected = true;
                     }
@@ -47,54 +36,37 @@ namespace HomieWrapper {
             }
         }
 
-        int sendCounter = 0;
         public bool TryReadModbusRegister(KomfoventRegisters register, out int value) {
             if (IsInitialized == false) {
                 value = 0;
                 return false;
             }
 
-            sendCounter++;
 
             var returnResult = false;
             value = 0;
 
             try {
-                //lock (_modbusLock) {
-                //_modbus.Connect().Wait();
-                ushort taskReturnValue = 0;
-                var bybis = new CancellationTokenSource();
-                bybis.CancelAfter(1000);
+                //var pyzdaTask = _modbus.ReadHoldingRegisters(2, (ushort)((ushort)register - 1), 1);
+                //var bybiWatch = Stopwatch.StartNew();
+                //var registers = pyzdaTask.Result;
+                //bybiWatch.Stop();
+                //Debug.WriteLine($"Bybiwatch: {bybiWatch.ElapsedMilliseconds}");
 
-                if (_modbus.IsConnected == false) {
-                    var papai = 1;
-                }
+                //if (pyzdaTask.Status == TaskStatus.RanToCompletion) {
+                //    if (registers != null) {
+                //        if (registers.Count == 0) { var pzdc = 1; }
 
-                //  Debug.WriteLine(_modbus.ConnectingTask);
-
-
-                var pyzdaTask = _modbus.ReadHoldingRegisters(2, (ushort)((ushort)register - 1), 1, bybis.Token);
-                var bybiWatch = Stopwatch.StartNew();
-                var registers = pyzdaTask.Result;
-                bybiWatch.Stop();
-                Debug.WriteLine($"Bybiwatch: {bybiWatch.ElapsedMilliseconds}");
-
-                if (pyzdaTask.Status == TaskStatus.RanToCompletion) {
-                    if (registers != null) {
-                        if (registers.Count == 0) { var pzdc = 1; }
-
-                        taskReturnValue = registers[0].RegisterValue;
-                    }
-                }
-                else {
-                    var pzdc = 1;
-                }
-
-                //_modbus.Disconnect().Wait();
-                Thread.Sleep(1000);
-
-                value = taskReturnValue;
+                //        value = registers[0].RegisterValue;
+                //    }
                 //}
+                //else {
+                //    var pzdc = 1;
+                //}
+
+                Thread.Sleep(10);
+
+
                 returnResult = true;
             }
             catch (Exception ex) {
@@ -112,7 +84,7 @@ namespace HomieWrapper {
 
             try {
                 lock (_modbusLock) {
-                    _modbus.WriteSingleRegister(2, new AMWD.Modbus.Common.Structures.ModbusObject() { Address = (ushort)((ushort)register - 1), RegisterValue = (ushort)value, Type = AMWD.Modbus.Common.ModbusObjectType.HoldingRegister });
+                    // _modbus.WriteSingleRegister(2, new AMWD.Modbus.Common.Structures.ModbusObject() { Address = (ushort)((ushort)register - 1), RegisterValue = (ushort)value, Type = AMWD.Modbus.Common.ModbusObjectType.HoldingRegister });
                 }
             }
             catch (Exception ex) {
@@ -125,7 +97,6 @@ namespace HomieWrapper {
         private CancellationTokenSource _globalCancellationTokenSource;
         private Logger _log = LogManager.GetCurrentClassLogger();
         private string _deviceIp = "localhost";
-        ModbusClient _modbus;
 
         private object _modbusLock = new object();
     }
