@@ -23,5 +23,6 @@
     <logger name="HomieWrapper.*" minlevel="Debug" writeTo="logFile" />
     <logger name="HomieWrapper.*" minlevel="Debug" writeTo="debugger" />
     <logger name="HomieWrapper.*" minlevel="Debug" writeTo="console" />
+    <logger name="*" minlevel="Debug" writeTo="console" />
   </rules>
 </nlog>

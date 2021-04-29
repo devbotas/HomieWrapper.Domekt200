@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Threading;
+using NLog;
 
 namespace SharpModbus {
     public class ModbusMaster : IDisposable {
-        public delegate void WriteToDeviceDelegate(byte[] payload);
-        public delegate int ReadFromDeviceDelegate(byte[] payload);
+        private Logger _log = LogManager.GetCurrentClassLogger();
 
-        public WriteToDeviceDelegate WriteToDevice;
-        public ReadFromDeviceDelegate ReadFromDevice;
+        public delegate bool WriteReadDeviceDelegate(byte[] sendBuffer, byte[] receiveBuffer);
+
+        public WriteReadDeviceDelegate WriteReadDevice;
 
         private readonly ModbusTCPProtocol protocol;
 
-        public ModbusMaster(ReadFromDeviceDelegate readDelegate, WriteToDeviceDelegate writeDelegate) {
-            ReadFromDevice = readDelegate;
-            WriteToDevice = writeDelegate;
+        public ModbusMaster(WriteReadDeviceDelegate writeReadDelegate) {
+            WriteReadDevice = writeReadDelegate;
             protocol = new ModbusTCPProtocol();
         }
 
@@ -74,10 +74,18 @@ namespace SharpModbus {
             var request = new byte[wrapper.RequestLength];
             var response = new byte[wrapper.ResponseLength];
             wrapper.FillRequest(request, 0);
-            WriteToDevice(request);
-            Thread.Sleep(100);
-            var count = ReadFromDevice(response);
-            if (count < response.Length) wrapper.CheckException(response, count);
+
+            var isOk = WriteReadDevice(request, response);
+
+            if (isOk == false) {
+                _log.Warn("Resending request.");
+                Thread.Sleep(100);
+                WriteReadDevice(request, response);
+            }
+
+
+            //var count = ReadFromDevice(response);
+            //if (count < response.Length) wrapper.CheckException(response, count);
             return wrapper.ParseResponse(response, 0);
         }
     }

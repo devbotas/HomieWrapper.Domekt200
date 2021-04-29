@@ -8,8 +8,9 @@ namespace HomieWrapper {
         private async Task PollDomektOverModbusContinuouslyAsync(CancellationToken cancellationToken) {
             Log.Info($"Spinning up parameter monitoring task.");
             while (true) {
-                try {
+                if (_reliableModbus.IsConnected == false) continue;
 
+                try {
                     var allOk = _reliableModbus.TryReadModbusRegister(KomfoventRegisters.StartStop, out var startStopStatus);
                     if (allOk) {
                         //

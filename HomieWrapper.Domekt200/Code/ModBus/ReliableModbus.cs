@@ -18,7 +18,7 @@ namespace HomieWrapper {
 
             _deviceIp = modbusDeviceIpAddress;
 
-            _modbus = new SharpModbus.ModbusMaster(ReceiveFromSocket, SendToSocket);
+            _modbus = new SharpModbus.ModbusMaster(WriteReadDevice);
 
             Task.Run(async () => await MonitorConnectionContinuously(_globalCancellationTokenSource.Token));
 
@@ -31,15 +31,17 @@ namespace HomieWrapper {
                         _log.Info($"Connecting to Modbus device at {_deviceIp}.");
                         Connect();
 
-                        _modbus.ReadFromDevice = ReceiveFromSocket;
+                        _modbus.WriteReadDevice = WriteReadDevice;
 
                         IsConnected = true;
                     }
                     catch (Exception ex) {
                         _log.Error(ex, $"{nameof(MonitorConnectionContinuously)} tried to connect to broker, but that did not work.");
                     }
+
+                    await Task.Delay(500, cancelationToken);
                 }
-                await Task.Delay(1000, cancelationToken);
+                await Task.Delay(10, cancelationToken);
             }
         }
 
@@ -119,12 +121,42 @@ namespace HomieWrapper {
             }
         }
         private void DisconnectAndCleanup() {
+            IsConnected = false;
             _socket?.Dispose();
             _socket = null;
-            IsConnected = false;
+        }
+
+        private bool WriteReadDevice(byte[] sendBuffer, byte[] receiveBuffer) {
+            var isOk = true;
+
+            if (IsConnected == false) { isOk = false; }
+
+            if (isOk) {
+                isOk = _socket.TrySend(sendBuffer, 0, sendBuffer.Length);
+
+                if (isOk == false) {
+                    _log.Warn("Couldn't send to ModBus device. Disconnecting.");
+                    DisconnectAndCleanup();
+                }
+            }
+            Thread.Sleep(100);
+
+            if (isOk) {
+                var receiveResult = _socket.TryReceive(receiveBuffer, 0, receiveBuffer.Length, receiveBuffer.Length);
+                if (receiveResult.IsOk == false) {
+                    _log.Warn("Couldn't receive from ModBus device. Disconnecting.");
+                    isOk = false;
+                    DisconnectAndCleanup();
+                }
+            }
+            Thread.Sleep(100);
+
+            return isOk;
         }
 
         private int ReceiveFromSocket(byte[] buffer) {
+            if (IsConnected == false) return 0;
+
             var returnByteCount = 0;
             var tempBuffer = new byte[128];
 
@@ -136,7 +168,7 @@ namespace HomieWrapper {
                         Array.Copy(tempBuffer, 0, buffer, 0, returnByteCount);
                     }
                     else {
-                        DisconnectAndCleanup();
+                        //DisconnectAndCleanup();
                     }
                 }
             }
@@ -145,11 +177,20 @@ namespace HomieWrapper {
         }
 
         private void SendToSocket(byte[] buffer) {
-            lock (_modbusLock) {
-                if (IsConnected) {
-                    var isOk = _socket.TrySend(buffer, 0, buffer.Length);
-                    if (isOk == false) {
-                        DisconnectAndCleanup();
+            if (IsConnected == false) return;
+
+            for (var i = 1; i <= 3; i++) {
+                if (i > 1) _log.Info($"{nameof(SendToSocket)} attempt #{i}...");
+                lock (_modbusLock) {
+                    if (IsConnected) {
+                        var isOk = _socket.TrySend(buffer, 0, buffer.Length);
+                        if (isOk) {
+                            i = 3;
+                        }
+                        else {
+                            DisconnectAndCleanup();
+                            Thread.Sleep(100);
+                        }
                     }
                 }
             }

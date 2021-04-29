@@ -64,6 +64,7 @@ namespace HomieWrapper {
                         break;
                 }
             };
+            _actualModbusConnectionState = _device.CreateHostEnumProperty(PropertyType.State, "general", "modbus-state", "Modbus state", new[] { "OK", "DISCONNECTED" });
 
             // Ventilation section.
             _device.UpdateNodeInfo("ventilation", "Ventilation related properties", "no-type");
@@ -89,6 +90,17 @@ namespace HomieWrapper {
                     _systemUptime.Value = (float)(DateTime.Now - _startTime).TotalHours;
 
                     await Task.Delay(5000);
+                }
+            });
+            Task.Run(async () => {
+                var cachedState = true;
+                while (true) {
+                    if (_reliableModbus.IsConnected != cachedState) {
+                        cachedState = _reliableModbus.IsConnected;
+                        _actualModbusConnectionState.Value = cachedState ? "OK" : "DISCONNECTED";
+                    }
+
+                    await Task.Delay(10);
                 }
             });
         }
