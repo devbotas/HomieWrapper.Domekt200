@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 
-namespace LightConversion.Software.Yarx {
+namespace HomieWrapper {
     class TcpSocketWrapper : IExceptionlessSocket {
         public Socket ActualSocket;
         public Exception LastException;

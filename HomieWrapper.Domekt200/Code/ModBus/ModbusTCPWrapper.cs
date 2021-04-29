@@ -1,9 +1,5 @@
-﻿using System;
-
-namespace SharpModbus
-{
-    public class ModbusTCPWrapper : IModbusWrapper
-    {
+﻿namespace SharpModbus {
+    public class ModbusTCPWrapper {
         private readonly IModbusCommand wrapped;
         private readonly ushort transactionId;
 
@@ -15,14 +11,12 @@ namespace SharpModbus
         public int RequestLength { get { return wrapped.RequestLength + 6; } }
         public int ResponseLength { get { return wrapped.ResponseLength + 6; } }
 
-        public ModbusTCPWrapper(IModbusCommand wrapped, ushort transactionId)
-        {
+        public ModbusTCPWrapper(IModbusCommand wrapped, ushort transactionId) {
             this.wrapped = wrapped;
             this.transactionId = transactionId;
         }
 
-        public void FillRequest(byte[] request, int offset)
-        {
+        public void FillRequest(byte[] request, int offset) {
             request[offset + 0] = ModbusHelper.High(transactionId);
             request[offset + 1] = ModbusHelper.Low(transactionId);
             request[offset + 2] = 0;
@@ -32,21 +26,18 @@ namespace SharpModbus
             wrapped.FillRequest(request, offset + 6);
         }
 
-        public object ParseResponse(byte[] response, int offset)
-        {
+        public object ParseResponse(byte[] response, int offset) {
             Tools.AssertEqual(ModbusHelper.GetUShort(response, offset + 0), transactionId, "TransactionId mismatch got {0} expected {1}");
             Tools.AssertEqual(ModbusHelper.GetUShort(response, offset + 2), 0, "Zero mismatch got {0} expected {1}");
             Tools.AssertEqual(ModbusHelper.GetUShort(response, offset + 4), wrapped.ResponseLength, "Length mismatch got {0} expected {1}");
             return wrapped.ParseResponse(response, offset + 6);
         }
 
-        public object ApplyTo(IModbusModel model)
-        {
+        public object ApplyTo(IModbusModel model) {
             return wrapped.ApplyTo(model);
         }
 
-        public void FillResponse(byte[] response, int offset, object value)
-        {
+        public void FillResponse(byte[] response, int offset, object value) {
             response[offset + 0] = ModbusHelper.High(transactionId);
             response[offset + 1] = ModbusHelper.Low(transactionId);
             response[offset + 2] = 0;
@@ -56,8 +47,7 @@ namespace SharpModbus
             wrapped.FillResponse(response, offset + 6, value);
         }
 
-        public byte[] GetException(byte code)
-        {
+        public byte[] GetException(byte code) {
             var exception = new byte[9];
             exception[0] = ModbusHelper.High(transactionId);
             exception[1] = ModbusHelper.Low(transactionId);
@@ -71,21 +61,18 @@ namespace SharpModbus
             return exception;
         }
 
-        public void CheckException(byte[] response, int count)
-        {
+        public void CheckException(byte[] response, int count) {
             if (count < 9) Tools.Throw("Partial packet exception got {0} expected >= {1}", count, 9);
             var offset = 6;
             var code = response[offset + 1];
-            if ((code & 0x80) != 0)
-            {
+            if ((code & 0x80) != 0) {
                 Tools.AssertEqual(response[offset + 0], wrapped.Slave, "Slave mismatch got {0} expected {1}");
                 Tools.AssertEqual(code & 0x7F, wrapped.Code, "Code mismatch got {0} expected {1}");
                 throw new ModbusException(response[offset + 2]);
             }
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             return string.Format("[ModbusTCPWrapper Wrapped={0}, TransactionId={1}]", wrapped, transactionId);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace SharpModbus {
     public class ModbusMaster : IDisposable {
@@ -8,19 +9,12 @@ namespace SharpModbus {
         public WriteToDeviceDelegate WriteToDevice;
         public ReadFromDeviceDelegate ReadFromDevice;
 
-        public static ModbusMaster TCP(string ip, int port, int timeout = 400) {
-            var socket = Tools.ConnectWithTimeout(ip, port, timeout);
-            var stream = new ModbusSocketStream(socket, timeout);
-            var protocol = new ModbusTCPProtocol();
-            return new ModbusMaster(stream, protocol);
-        }
-
         private readonly ModbusTCPProtocol protocol;
-        // private readonly ModbusSocketStream stream;
 
-        public ModbusMaster(ModbusSocketStream stream, ModbusTCPProtocol protocol) {
-            // this.stream = stream;
-            this.protocol = protocol;
+        public ModbusMaster(ReadFromDeviceDelegate readDelegate, WriteToDeviceDelegate writeDelegate) {
+            ReadFromDevice = readDelegate;
+            WriteToDevice = writeDelegate;
+            protocol = new ModbusTCPProtocol();
         }
 
         public void Dispose() {
@@ -81,6 +75,7 @@ namespace SharpModbus {
             var response = new byte[wrapper.ResponseLength];
             wrapper.FillRequest(request, 0);
             WriteToDevice(request);
+            Thread.Sleep(100);
             var count = ReadFromDevice(response);
             if (count < response.Length) wrapper.CheckException(response, count);
             return wrapper.ParseResponse(response, 0);

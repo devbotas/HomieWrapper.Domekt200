@@ -1,4 +1,4 @@
-﻿namespace LightConversion.Software.Yarx {
+﻿namespace HomieWrapper {
     public interface IExceptionlessSocket {
         /// <summary>
         /// Sends data from <see cref="dataToSend"/> buffer at specified offset and length. Blocks until all data is sent.
