@@ -1,9 +1,8 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using NLog;
 
 namespace SharpModbus {
-    public class ModbusMaster : IDisposable {
+    public class ModbusMaster {
         private Logger _log = LogManager.GetCurrentClassLogger();
 
         public delegate bool WriteReadDeviceDelegate(byte[] sendBuffer, byte[] receiveBuffer);
@@ -12,16 +11,10 @@ namespace SharpModbus {
 
         public ushort TransactionId { get; set; } = 0;
 
-        public ModbusMaster() {
-
-        }
+        public ModbusMaster() { }
 
         public void Initialize(WriteReadDeviceDelegate writeReadDelegate) {
             WriteReadDevice = writeReadDelegate;
-        }
-
-        public void Dispose() {
-
         }
 
         public bool ReadCoil(byte slave, ushort address) {
@@ -86,9 +79,6 @@ namespace SharpModbus {
                 WriteReadDevice(request, response);
             }
 
-
-            //var count = ReadFromDevice(response);
-            //if (count < response.Length) wrapper.CheckException(response, count);
             return wrapper.ParseResponse(response, 0);
         }
     }
