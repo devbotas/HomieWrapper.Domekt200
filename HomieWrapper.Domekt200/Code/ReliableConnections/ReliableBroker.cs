@@ -30,6 +30,12 @@ namespace HomieWrapper {
                 IsConnected = false;
             });
 
+#warning WTF, putting those 3 lines in connection monitor task breaks reception?..
+            var options = new MqttClientOptionsBuilder().WithClientId(_mqttClientGuid).WithTcpServer(_mqttBrokerIp, 1883).Build();
+            _mqttClient.ConnectAsync(options, CancellationToken.None).Wait();
+            IsConnected = true;
+
+
             Task.Run(async () => await MonitorMqttConnectionContinuously(_globalCancellationTokenSource.Token));
 
             IsInitialized = true;
