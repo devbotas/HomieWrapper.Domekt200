@@ -40,31 +40,6 @@
             Wrapped.FillResponse(response, offset + 6, value);
         }
 
-        public byte[] GetException(byte code) {
-            var exception = new byte[9];
-            exception[0] = ModbusHelper.High(TransactionId);
-            exception[1] = ModbusHelper.Low(TransactionId);
-            exception[2] = 0;
-            exception[3] = 0;
-            exception[4] = ModbusHelper.High(3);
-            exception[5] = ModbusHelper.Low(3);
-            exception[6 + 0] = Wrapped.Slave;
-            exception[6 + 1] = (byte)(Wrapped.Code | 0x80);
-            exception[6 + 2] = code;
-            return exception;
-        }
-
-        public void CheckException(byte[] response, int count) {
-            if (count < 9) Tools.Throw("Partial packet exception got {0} expected >= {1}", count, 9);
-            var offset = 6;
-            var code = response[offset + 1];
-            if ((code & 0x80) != 0) {
-                Tools.AssertEqual(response[offset + 0], Wrapped.Slave, "Slave mismatch got {0} expected {1}");
-                Tools.AssertEqual(code & 0x7F, Wrapped.Code, "Code mismatch got {0} expected {1}");
-                throw new ModbusException(response[offset + 2]);
-            }
-        }
-
         public override string ToString() {
             return string.Format("[ModbusTCPWrapper Wrapped={0}, TransactionId={1}]", Wrapped, TransactionId);
         }
