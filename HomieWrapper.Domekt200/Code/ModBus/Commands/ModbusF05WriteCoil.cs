@@ -1,4 +1,6 @@
-﻿namespace SharpModbus {
+﻿using static SharpModbus.ModbusHelper;
+
+namespace SharpModbus {
     public class ModbusF05WriteCoil : IModbusCommand {
         public byte Code { get { return 5; } }
         public byte Slave { get; }
@@ -16,18 +18,18 @@
         public void FillRequest(byte[] request, int offset) {
             request[offset + 0] = Slave;
             request[offset + 1] = 5;
-            request[offset + 2] = ModbusHelper.High(Address);
-            request[offset + 3] = ModbusHelper.Low(Address);
-            request[offset + 4] = ModbusHelper.EncodeBool(Value);
+            request[offset + 2] = High(Address);
+            request[offset + 3] = Low(Address);
+            request[offset + 4] = EncodeBool(Value);
             request[offset + 5] = 0;
         }
 
         public object ParseResponse(byte[] response, int offset) {
-            Tools.AssertEqual(response[offset + 0], Slave, "Slave mismatch got {0} expected {1}");
-            Tools.AssertEqual(response[offset + 1], 5, "Function mismatch got {0} expected {1}");
-            Tools.AssertEqual(ModbusHelper.GetUShort(response, offset + 2), Address, "Address mismatch got {0} expected {1}");
-            Tools.AssertEqual(response[offset + 4], ModbusHelper.EncodeBool(Value), "Value mismatch got {0} expected {1}");
-            Tools.AssertEqual(response[offset + 5], 0, "Pad mismatch {0} expected:{1}");
+            AssertEqual(response[offset + 0], Slave, "Slave mismatch got {0} expected {1}");
+            AssertEqual(response[offset + 1], 5, "Function mismatch got {0} expected {1}");
+            AssertEqual(GetUShort(response, offset + 2), Address, "Address mismatch got {0} expected {1}");
+            AssertEqual(response[offset + 4], EncodeBool(Value), "Value mismatch got {0} expected {1}");
+            AssertEqual(response[offset + 5], 0, "Pad mismatch {0} expected:{1}");
             return null;
         }
 

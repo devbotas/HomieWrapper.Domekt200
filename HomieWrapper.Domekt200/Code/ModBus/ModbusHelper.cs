@@ -1,4 +1,6 @@
-﻿namespace SharpModbus {
+﻿using System;
+
+namespace SharpModbus {
     public static class ModbusHelper {
         public static byte EncodeBool(bool value) {
             return (byte)(value ? 0xFF : 0x00);
@@ -116,6 +118,16 @@
             for (var i = 0; i < values.Length; i++)
                 clone[i] = values[i];
             return clone;
+        }
+
+        public static void AssertEqual(int a, int b, string format) {
+            if (a != b) Throw(format, a, b);
+        }
+
+        public static void Throw(string format, params object[] args) {
+            var message = format;
+            if (args.Length > 0) message = string.Format(format, args);
+            throw new Exception(message);
         }
     }
 }
