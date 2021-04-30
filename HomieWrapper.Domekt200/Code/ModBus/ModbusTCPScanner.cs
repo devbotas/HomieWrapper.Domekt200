@@ -2,20 +2,20 @@
 
 namespace SharpModbus {
     public class ModbusTCPScanner {
-        private readonly ModbusTCPProtocol protocol = new ModbusTCPProtocol();
-        private readonly List<byte> buffer = new List<byte>();
+        private readonly ModbusTCPProtocol _protocol = new();
+        private readonly List<byte> _buffer = new();
 
         public void Append(byte[] data, int offset, int count) {
-            for (var i = 0; i < count; i++) buffer.Add(data[offset + i]);
+            for (var i = 0; i < count; i++) _buffer.Add(data[offset + i]);
         }
 
         public ModbusTCPWrapper Scan() {
-            if (buffer.Count >= 6) {
-                var length = ModbusHelper.GetUShort(buffer[4], buffer[5]);
-                if (buffer.Count >= 6 + length) {
-                    var request = buffer.GetRange(0, 6 + length).ToArray();
-                    buffer.RemoveRange(0, 6 + length);
-                    return protocol.Parse(request, 0);
+            if (_buffer.Count >= 6) {
+                var length = ModbusHelper.GetUShort(_buffer[4], _buffer[5]);
+                if (_buffer.Count >= 6 + length) {
+                    var request = _buffer.GetRange(0, 6 + length).ToArray();
+                    _buffer.RemoveRange(0, 6 + length);
+                    return _protocol.Parse(request, 0);
                 }
             }
             return null; //not enough data to parse

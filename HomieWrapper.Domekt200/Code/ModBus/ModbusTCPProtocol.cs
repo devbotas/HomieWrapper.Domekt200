@@ -1,14 +1,9 @@
 ﻿namespace SharpModbus {
     public class ModbusTCPProtocol {
-        private ushort transactionId = 0;
-
-        public ushort TransactionId {
-            get { return transactionId; }
-            set { transactionId = value; }
-        }
+        public ushort TransactionId { get; set; } = 0;
 
         public ModbusTCPWrapper Wrap(IModbusCommand wrapped) {
-            return new ModbusTCPWrapper(wrapped, transactionId++);
+            return new ModbusTCPWrapper(wrapped, TransactionId++);
         }
 
         public ModbusTCPWrapper Parse(byte[] request, int offset) {

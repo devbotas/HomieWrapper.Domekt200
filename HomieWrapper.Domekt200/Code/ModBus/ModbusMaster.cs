@@ -10,10 +10,10 @@ namespace SharpModbus {
 
         public WriteReadDeviceDelegate WriteReadDevice;
 
-        private readonly ModbusTCPProtocol protocol;
+        private readonly ModbusTCPProtocol _protocol;
 
         public ModbusMaster() {
-            protocol = new ModbusTCPProtocol();
+            _protocol = new ModbusTCPProtocol();
         }
 
         public void Initialize(WriteReadDeviceDelegate writeReadDelegate) {
@@ -21,7 +21,7 @@ namespace SharpModbus {
         }
 
         public void Dispose() {
-            // Tools.Dispose(stream);
+
         }
 
         public bool ReadCoil(byte slave, ushort address) {
@@ -73,7 +73,7 @@ namespace SharpModbus {
         }
 
         private object Execute(IModbusCommand cmd) {
-            var wrapper = protocol.Wrap(cmd);
+            var wrapper = _protocol.Wrap(cmd);
             var request = new byte[wrapper.RequestLength];
             var response = new byte[wrapper.ResponseLength];
             wrapper.FillRequest(request, 0);

@@ -8,110 +8,110 @@ namespace SharpModbus {
         WI
     }
 
-    public class ModbusModel : IModbusModel {
-        private readonly IDictionary<string, bool> digitals = new Dictionary<string, bool>();
-        private readonly IDictionary<string, ushort> words = new Dictionary<string, ushort>();
+    public class ModbusModel {
+        private readonly IDictionary<string, bool> _digitals = new Dictionary<string, bool>();
+        private readonly IDictionary<string, ushort> _words = new Dictionary<string, ushort>();
 
-        public void setDI(byte slave, ushort address, bool value) {
+        public void SetDI(byte slave, ushort address, bool value) {
             var key = Key(ModbusIoType.DI, slave, address);
-            digitals[key] = value;
+            _digitals[key] = value;
         }
 
-        public void setDIs(byte slave, ushort address, bool[] values) {
+        public void SetDIs(byte slave, ushort address, bool[] values) {
             for (var i = 0; i < values.Length; i++) {
                 var key = Key(ModbusIoType.DI, slave, address + i);
-                digitals[key] = values[i];
+                _digitals[key] = values[i];
             }
         }
 
-        public bool getDI(byte slave, ushort address) {
+        public bool GetDI(byte slave, ushort address) {
             var key = Key(ModbusIoType.DI, slave, address);
-            return digitals[key];
+            return _digitals[key];
         }
 
-        public bool[] getDIs(byte slave, ushort address, int count) {
+        public bool[] GetDIs(byte slave, ushort address, int count) {
             var values = new bool[count];
             for (var i = 0; i < values.Length; i++) {
                 var key = Key(ModbusIoType.DI, slave, address + i);
-                values[i] = digitals[key];
+                values[i] = _digitals[key];
             }
             return values;
         }
 
-        public void setDO(byte slave, ushort address, bool value) {
+        public void SetDO(byte slave, ushort address, bool value) {
             var key = Key(ModbusIoType.DO, slave, address);
-            digitals[key] = value;
+            _digitals[key] = value;
         }
 
-        public void setDOs(byte slave, ushort address, bool[] values) {
+        public void SetDOs(byte slave, ushort address, bool[] values) {
             for (var i = 0; i < values.Length; i++) {
                 var key = Key(ModbusIoType.DO, slave, address + i);
-                digitals[key] = values[i];
+                _digitals[key] = values[i];
             }
         }
 
-        public bool getDO(byte slave, ushort address) {
+        public bool GetDO(byte slave, ushort address) {
             var key = Key(ModbusIoType.DO, slave, address);
-            return digitals[key];
+            return _digitals[key];
         }
 
-        public bool[] getDOs(byte slave, ushort address, int count) {
+        public bool[] GetDOs(byte slave, ushort address, int count) {
             var values = new bool[count];
             for (var i = 0; i < values.Length; i++) {
                 var key = Key(ModbusIoType.DO, slave, address + i);
-                values[i] = digitals[key];
+                values[i] = _digitals[key];
             }
             return values;
         }
 
-        public void setWI(byte slave, ushort address, ushort value) {
+        public void SetWI(byte slave, ushort address, ushort value) {
             var key = Key(ModbusIoType.WI, slave, address);
-            words[key] = value;
+            _words[key] = value;
         }
 
-        public void setWIs(byte slave, ushort address, ushort[] values) {
+        public void SetWIs(byte slave, ushort address, ushort[] values) {
             for (var i = 0; i < values.Length; i++) {
                 var key = Key(ModbusIoType.WI, slave, address + i);
-                words[key] = values[i];
+                _words[key] = values[i];
             }
         }
 
-        public ushort getWI(byte slave, ushort address) {
+        public ushort GetWI(byte slave, ushort address) {
             var key = Key(ModbusIoType.WI, slave, address);
-            return words[key];
+            return _words[key];
         }
 
-        public ushort[] getWIs(byte slave, ushort address, int count) {
+        public ushort[] GetWIs(byte slave, ushort address, int count) {
             var values = new ushort[count];
             for (var i = 0; i < values.Length; i++) {
                 var key = Key(ModbusIoType.WI, slave, address + i);
-                values[i] = words[key];
+                values[i] = _words[key];
             }
             return values;
         }
 
-        public void setWO(byte slave, ushort address, ushort value) {
+        public void SetWO(byte slave, ushort address, ushort value) {
             var key = Key(ModbusIoType.WO, slave, address);
-            words[key] = value;
+            _words[key] = value;
         }
 
-        public void setWOs(byte slave, ushort address, ushort[] values) {
+        public void SetWOs(byte slave, ushort address, ushort[] values) {
             for (var i = 0; i < values.Length; i++) {
                 var key = Key(ModbusIoType.WO, slave, address + i);
-                words[key] = values[i];
+                _words[key] = values[i];
             }
         }
 
-        public ushort getWO(byte slave, ushort address) {
+        public ushort GetWO(byte slave, ushort address) {
             var key = Key(ModbusIoType.WO, slave, address);
-            return words[key];
+            return _words[key];
         }
 
-        public ushort[] getWOs(byte slave, ushort address, int count) {
+        public ushort[] GetWOs(byte slave, ushort address, int count) {
             var values = new ushort[count];
             for (var i = 0; i < values.Length; i++) {
                 var key = Key(ModbusIoType.WO, slave, address + i);
-                values[i] = words[key];
+                values[i] = _words[key];
             }
             return values;
         }

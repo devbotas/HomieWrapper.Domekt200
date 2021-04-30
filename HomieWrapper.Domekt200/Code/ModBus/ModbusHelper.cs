@@ -51,14 +51,14 @@
 
         public static ushort[] DecodeWords(byte[] packet, int offset, ushort count) {
             var results = new ushort[count];
-            for (int i = 0; i < count; i++) {
+            for (var i = 0; i < count; i++) {
                 results[i] = (ushort)(packet[offset + 2 * i] << 8 | packet[offset + 2 * i + 1]);
             }
             return results;
         }
 
         private static void ByteToBools(byte b, bool[] bools, int offset, int count) {
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
                 bools[offset + i] = ((b >> i) & 0x01) == 1;
         }
 
