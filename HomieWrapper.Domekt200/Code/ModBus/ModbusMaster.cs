@@ -10,10 +10,10 @@ namespace SharpModbus {
 
         public WriteReadDeviceDelegate WriteReadDevice;
 
-        private readonly ModbusTCPProtocol _protocol;
+        public ushort TransactionId { get; set; } = 0;
 
         public ModbusMaster() {
-            _protocol = new ModbusTCPProtocol();
+
         }
 
         public void Initialize(WriteReadDeviceDelegate writeReadDelegate) {
@@ -73,7 +73,7 @@ namespace SharpModbus {
         }
 
         private object Execute(IModbusCommand cmd) {
-            var wrapper = _protocol.Wrap(cmd);
+            var wrapper = new ModbusTCPWrapper(cmd, TransactionId++);
             var request = new byte[wrapper.RequestLength];
             var response = new byte[wrapper.ResponseLength];
             wrapper.FillRequest(request, 0);

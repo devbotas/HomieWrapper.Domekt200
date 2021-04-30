@@ -9,8 +9,8 @@
         public int ResponseLength { get { return Wrapped.ResponseLength + 6; } }
 
         public ModbusTCPWrapper(IModbusCommand wrapped, ushort transactionId) {
-            this.Wrapped = wrapped;
-            this.TransactionId = transactionId;
+            Wrapped = wrapped;
+            TransactionId = transactionId;
         }
 
         public void FillRequest(byte[] request, int offset) {
