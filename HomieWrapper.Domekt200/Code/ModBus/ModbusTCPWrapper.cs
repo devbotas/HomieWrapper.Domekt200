@@ -30,10 +30,6 @@
             return Wrapped.ParseResponse(response, offset + 6);
         }
 
-        public object ApplyTo(ModbusModel model) {
-            return Wrapped.ApplyTo(model);
-        }
-
         public void FillResponse(byte[] response, int offset, object value) {
             response[offset + 0] = ModbusHelper.High(TransactionId);
             response[offset + 1] = ModbusHelper.Low(TransactionId);

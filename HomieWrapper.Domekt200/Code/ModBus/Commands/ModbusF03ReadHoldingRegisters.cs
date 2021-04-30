@@ -30,10 +30,6 @@
             return ModbusHelper.DecodeWords(response, offset + 3, Count);
         }
 
-        public object ApplyTo(ModbusModel model) {
-            return model.GetWOs(Slave, Address, Count);
-        }
-
         public void FillResponse(byte[] response, int offset, object value) {
             var bytes = ModbusHelper.BytesForWords(Count);
             response[offset + 0] = Slave;

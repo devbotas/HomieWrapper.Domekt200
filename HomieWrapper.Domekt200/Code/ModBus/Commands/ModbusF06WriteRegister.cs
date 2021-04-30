@@ -30,11 +30,6 @@
             return null;
         }
 
-        public object ApplyTo(ModbusModel model) {
-            model.SetWO(Slave, Address, Value);
-            return null;
-        }
-
         public void FillResponse(byte[] response, int offset, object value) {
             FillRequest(response, offset);
         }
