@@ -12,9 +12,12 @@ namespace SharpModbus {
 
         private readonly ModbusTCPProtocol protocol;
 
-        public ModbusMaster(WriteReadDeviceDelegate writeReadDelegate) {
-            WriteReadDevice = writeReadDelegate;
+        public ModbusMaster() {
             protocol = new ModbusTCPProtocol();
+        }
+
+        public void Initialize(WriteReadDeviceDelegate writeReadDelegate) {
+            WriteReadDevice = writeReadDelegate;
         }
 
         public void Dispose() {

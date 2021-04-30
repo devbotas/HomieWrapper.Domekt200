@@ -18,7 +18,7 @@ namespace HomieWrapper {
 
             _deviceIp = modbusDeviceIpAddress;
 
-            _modbus = new SharpModbus.ModbusMaster(WriteReadDevice);
+            _modbus = new SharpModbus.ModbusMaster();
 
             Task.Run(async () => await MonitorConnectionContinuously(_globalCancellationTokenSource.Token));
 
@@ -31,7 +31,7 @@ namespace HomieWrapper {
                         _log.Info($"Connecting to Modbus device at {_deviceIp}.");
                         Connect();
 
-                        _modbus.WriteReadDevice = WriteReadDevice;
+                        _modbus.Initialize(WriteReadDevice);
 
                         IsConnected = true;
                     }
@@ -139,7 +139,8 @@ namespace HomieWrapper {
                     DisconnectAndCleanup();
                 }
             }
-            Thread.Sleep(100);
+
+            if (isOk) { Thread.Sleep(100); }
 
             if (isOk) {
                 var receiveResult = _socket.TryReceive(receiveBuffer, 0, receiveBuffer.Length, receiveBuffer.Length);
@@ -149,51 +150,10 @@ namespace HomieWrapper {
                     DisconnectAndCleanup();
                 }
             }
-            Thread.Sleep(100);
+
+            if (isOk) { Thread.Sleep(50); }
 
             return isOk;
-        }
-
-        private int ReceiveFromSocket(byte[] buffer) {
-            if (IsConnected == false) return 0;
-
-            var returnByteCount = 0;
-            var tempBuffer = new byte[128];
-
-            lock (_modbusLock) {
-                if (IsConnected) {
-                    var receiveResult = _socket.TryReceive(tempBuffer, 0, 9, 128);
-                    if (receiveResult.IsOk) {
-                        returnByteCount = receiveResult.Count;
-                        Array.Copy(tempBuffer, 0, buffer, 0, returnByteCount);
-                    }
-                    else {
-                        //DisconnectAndCleanup();
-                    }
-                }
-            }
-
-            return returnByteCount;
-        }
-
-        private void SendToSocket(byte[] buffer) {
-            if (IsConnected == false) return;
-
-            for (var i = 1; i <= 3; i++) {
-                if (i > 1) _log.Info($"{nameof(SendToSocket)} attempt #{i}...");
-                lock (_modbusLock) {
-                    if (IsConnected) {
-                        var isOk = _socket.TrySend(buffer, 0, buffer.Length);
-                        if (isOk) {
-                            i = 3;
-                        }
-                        else {
-                            DisconnectAndCleanup();
-                            Thread.Sleep(100);
-                        }
-                    }
-                }
-            }
         }
     }
 }
