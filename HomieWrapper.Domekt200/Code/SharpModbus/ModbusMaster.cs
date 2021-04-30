@@ -11,7 +11,8 @@ namespace SharpModbus {
 
         public ushort TransactionId { get; set; } = 0;
 
-        public ModbusMaster() { }
+        public ModbusMaster() {
+        }
 
         public void Initialize(WriteReadDeviceDelegate writeReadDelegate) {
             WriteReadDevice = writeReadDelegate;

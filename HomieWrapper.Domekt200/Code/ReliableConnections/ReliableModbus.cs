@@ -7,6 +7,13 @@ using NLog;
 
 namespace HomieWrapper {
     class ReliableModbus {
+        private string _deviceIp = "localhost";
+        private CancellationTokenSource _globalCancellationTokenSource;
+        private Logger _log = LogManager.GetCurrentClassLogger();
+        private SharpModbus.ModbusMaster _modbus;
+        private object _modbusLock = new object();
+        private IExceptionlessSocket _socket;
+
         public bool IsConnected { get; private set; }
         public bool IsInitialized { get; private set; }
         public Exception LastException { get; private set; }
@@ -75,9 +82,7 @@ namespace HomieWrapper {
             var returnResult = false;
 
             try {
-
                 _modbus.WriteRegister(2, (ushort)((ushort)register - 1), (ushort)value);
-
             }
             catch (Exception ex) {
                 _log.Warn($"Could not write ModBus register {register}, because of {ex.Message}.");
@@ -86,15 +91,6 @@ namespace HomieWrapper {
             return returnResult;
         }
 
-        private CancellationTokenSource _globalCancellationTokenSource;
-        private Logger _log = LogManager.GetCurrentClassLogger();
-        private string _deviceIp = "localhost";
-
-        private object _modbusLock = new object();
-        private IExceptionlessSocket _socket;
-
-        private SharpModbus.ModbusMaster _modbus;
-
         private void Connect() {
             try {
                 var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -102,7 +98,7 @@ namespace HomieWrapper {
                 socket.SendTimeout = 1000;
 
                 if (_deviceIp.ToLower() == "localhost") {
-                    // Localhost works fine on Windows, but we experienced problems on our Torizon Linux machines.
+                    // Localhost works fine on Windows, but we experienced problems on Linux machines.
                     // Also, connecting to "localhost" will have to go to DNS which is much slower than simply using 127.0.0.1.
                     // Therefore I replace it here and hopefully save some debugging hours.
                     socket.Connect("127.0.0.1", 502);
@@ -125,7 +121,6 @@ namespace HomieWrapper {
             _socket?.Dispose();
             _socket = null;
         }
-
         private bool WriteReadDevice(byte[] sendBuffer, byte[] receiveBuffer) {
             var isOk = true;
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,8 +21,6 @@ namespace HomieWrapper {
                     }
                     else {
                         Log.Warn("Failed to parse read date.");
-                        //_modbus.Disconnect().Wait();
-                        //_modbus.Connect().Wait();
                     }
 
                     allOk = _reliableModbus.TryReadModbusRegister(KomfoventRegisters.VentilationLevelManual, out var ventilationLevelManual);
@@ -88,16 +85,8 @@ namespace HomieWrapper {
                         _supplyAirTemperatureProperty.Value = supplyAirTemperature / 10.0f;
                     }
                 }
-                catch (IOException ex) {
-                    Log.Error($"Reading registers failed, because: {ex.Message}");
-
-                    // I think Domekt Ping module has serious mutex issues. Using it from the web and over RS485 simulteneously results in reboot?.. Trying to reconnect in such case.
-                    // Log.Error($"Reconnecting...");
-                    //_modbus.Disconnect().Wait();
-                    //_modbus.Connect().Wait();
-                }
                 catch (Exception ex) {
-                    var bybis = 1;
+                    Log.Error($"Reading registers failed, because: {ex.Message}");
                 }
 
                 await Task.Delay(1000, cancellationToken);

@@ -21,8 +21,6 @@ namespace HomieWrapper {
 
         public static Logger Log = LogManager.GetLogger("HomieWrapper.Domekt200");
 
-        public Domekt200() {
-
-        }
+        public Domekt200() { }
     }
 }
