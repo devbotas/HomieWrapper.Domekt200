@@ -17,6 +17,7 @@ namespace HomieWrapper {
         public bool IsConnected { get; private set; }
         public bool IsInitialized { get; private set; }
         public Exception LastException { get; private set; }
+        public int DisconnectCount { get; private set; }
 
         public void Initialize(string modbusDeviceIpAddress) {
             if (IsInitialized) { return; }
@@ -34,6 +35,8 @@ namespace HomieWrapper {
         public async Task MonitorConnectionContinuously(CancellationToken cancelationToken) {
             while (cancelationToken.IsCancellationRequested == false) {
                 if (IsConnected == false) {
+                    DisconnectCount++;
+
                     try {
                         _log.Info($"Connecting to Modbus device at {_deviceIp}.");
                         Connect();

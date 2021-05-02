@@ -78,6 +78,7 @@ namespace HomieWrapper {
             _device.UpdateNodeInfo("system", "System", "no-type");
             _actualDateTimeProperty = _device.CreateHostStringProperty(PropertyType.State, "system", "date-time", "Current date ant time.", "");
             _systemUptime = _device.CreateHostFloatProperty(PropertyType.State, "system", "uptime", "Uptime", 0, "h");
+            _disconnectCount = _device.CreateHostIntegerProperty(PropertyType.State, "system", "disconnect-count", "Modbus disconnect count");
 
             // Now starting up everything.
             Log.Info($"Initializing Homie entities.");
@@ -98,6 +99,7 @@ namespace HomieWrapper {
                     if (_reliableModbus.IsConnected != cachedState) {
                         cachedState = _reliableModbus.IsConnected;
                         _actualModbusConnectionState.Value = cachedState ? "OK" : "DISCONNECTED";
+                        _disconnectCount.Value = _reliableModbus.DisconnectCount;
                     }
 
                     await Task.Delay(10);

@@ -15,6 +15,7 @@ namespace HomieWrapper {
         HostEnumProperty _actualVentilationLevelProperty;
         HostFloatProperty _supplyAirTemperatureProperty;
         HostEnumProperty _actualModbusConnectionState;
+        HostIntegerProperty _disconnectCount;
 
         private DateTime _startTime = DateTime.Now;
         private HostFloatProperty _systemUptime;
