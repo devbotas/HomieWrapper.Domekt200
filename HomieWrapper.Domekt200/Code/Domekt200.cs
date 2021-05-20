@@ -6,8 +6,8 @@ namespace HomieWrapper {
     partial class Domekt200 {
         private HostDevice _device;
 
-        private ReliableBroker _reliableBroker;
-        private ReliableModbus _reliableModbus;
+        private ReliableBroker _reliableBroker = new ReliableBroker();
+        private ReliableModbus _reliableModbus = new ReliableModbus();
 
         HostStringProperty _actualDateTimeProperty;
         HostEnumProperty _actualState;

@@ -5,10 +5,7 @@ using DevBot9.Protocols.Homie;
 
 namespace HomieWrapper {
     partial class Domekt200 {
-        public void Initialize(ReliableBroker reliableBroker, ReliableModbus reliableModbus) {
-            _reliableBroker = reliableBroker;
-            _reliableModbus = reliableModbus;
-
+        public void Initialize(string brokerIp, string modBusIp) {
             Log.Info($"Creating Homie properties.");
             _device = DeviceFactory.CreateHostDevice("recuperator", "Domekt 200");
             _reliableBroker.PublishReceived += _device.HandlePublishReceived;
@@ -82,6 +79,8 @@ namespace HomieWrapper {
 
             // Now starting up everything.
             Log.Info($"Initializing Homie entities.");
+            _reliableBroker.Initialize(brokerIp, _device.WillTopic, _device.WillPayload);
+            _reliableModbus.Initialize(modBusIp);
             _device.Initialize(_reliableBroker.PublishToTopic, _reliableBroker.SubscribeToTopic);
 
             // Spinning up spinners.
