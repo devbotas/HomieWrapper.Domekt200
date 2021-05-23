@@ -1,12 +1,13 @@
 ﻿using System;
 using DevBot9.Protocols.Homie;
+using DevBot9.Protocols.Homie.Utilities;
 using NLog;
 
 namespace HomieWrapper {
     partial class Domekt200 {
         private HostDevice _device;
 
-        private ReliableBroker _reliableBroker = new ReliableBroker();
+        private ResilientHomieBroker _broker = new ResilientHomieBroker();
         private ReliableModbus _reliableModbus = new ReliableModbus();
 
         HostStringProperty _actualDateTimeProperty;

@@ -8,7 +8,6 @@ namespace HomieWrapper {
         public void Initialize(string brokerIp, string modBusIp) {
             Log.Info($"Creating Homie properties.");
             _device = DeviceFactory.CreateHostDevice("recuperator", "Domekt 200");
-            _reliableBroker.PublishReceived += _device.HandlePublishReceived;
 
             // General section.
             _device.UpdateNodeInfo("general", "General information", "no-type");
@@ -79,9 +78,13 @@ namespace HomieWrapper {
 
             // Now starting up everything.
             Log.Info($"Initializing Homie entities.");
-            _reliableBroker.Initialize(brokerIp, _device.WillTopic, _device.WillPayload);
-            _reliableModbus.Initialize(modBusIp);
-            _device.Initialize(_reliableBroker.PublishToTopic, _reliableBroker.SubscribeToTopic);
+            _broker.PublishReceived += _device.HandlePublishReceived;
+            _broker.Initialize(brokerIp, _device.WillTopic, _device.WillPayload, (severity, message) => {
+                if (severity == "Info") { Log.Info(message); }
+                else if (severity == "Error") { Log.Error(message); }
+                else { Log.Debug(message); }
+            });
+            _device.Initialize(_broker.PublishToTopic, _broker.SubscribeToTopic);
 
             // Spinning up spinners.
             Task.Run(async () => await PollDomektOverModbusContinuouslyAsync(new CancellationToken()));
