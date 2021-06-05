@@ -78,6 +78,7 @@ namespace HomieWrapper {
 
             // Now starting up everything.
             Log.Info($"Initializing Homie entities.");
+            _reliableModbus.Initialize(modBusIp);
             _broker.PublishReceived += _device.HandlePublishReceived;
             _broker.Initialize(brokerIp, _device.WillTopic, _device.WillPayload, (severity, message) => {
                 if (severity == "Info") { Log.Info(message); }
@@ -98,11 +99,17 @@ namespace HomieWrapper {
             Task.Run(async () => {
                 var cachedState = true;
                 while (true) {
-                    if (_reliableModbus.IsConnected != cachedState) {
-                        cachedState = _reliableModbus.IsConnected;
-                        _actualModbusConnectionState.Value = cachedState ? "OK" : "DISCONNECTED";
+
+                    if ((_reliableModbus.IsConnected == false) && (cachedState == true)) {
+                        _actualModbusConnectionState.Value = "DISCONNECTED";
                         _disconnectCount.Value = _reliableModbus.DisconnectCount;
                     }
+
+                    if ((_reliableModbus.IsConnected == true) && (cachedState == false)) {
+                        _actualModbusConnectionState.Value = "OK";
+                    }
+
+                    cachedState = _reliableModbus.IsConnected;
 
                     await Task.Delay(10);
                 }

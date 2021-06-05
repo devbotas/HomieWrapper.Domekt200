@@ -32,29 +32,6 @@ namespace HomieWrapper {
 
             IsInitialized = true;
         }
-        public async Task MonitorConnectionContinuously(CancellationToken cancelationToken) {
-            while (cancelationToken.IsCancellationRequested == false) {
-                if (IsConnected == false) {
-                    DisconnectCount++;
-
-                    try {
-                        _log.Info($"Connecting to Modbus device at {_deviceIp}.");
-                        Connect();
-
-                        _modbus.Initialize(WriteReadDevice);
-
-                        IsConnected = true;
-                    }
-                    catch (Exception ex) {
-                        _log.Error(ex, $"{nameof(MonitorConnectionContinuously)} tried to connect to broker, but that did not work.");
-                    }
-
-                    await Task.Delay(500, cancelationToken);
-                }
-                await Task.Delay(10, cancelationToken);
-            }
-        }
-
         public bool TryReadModbusRegister(KomfoventRegisters register, out int value) {
             if (IsInitialized == false) {
                 value = 0;
@@ -92,6 +69,31 @@ namespace HomieWrapper {
             }
 
             return returnResult;
+        }
+
+        private async Task MonitorConnectionContinuously(CancellationToken cancelationToken) {
+            if (IsInitialized == false) { throw new InvalidOperationException("Call the initialize method first!"); }
+
+            while (cancelationToken.IsCancellationRequested == false) {
+                if (IsConnected == false) {
+                    DisconnectCount++;
+
+                    try {
+                        _log.Info($"Connecting to Modbus device at {_deviceIp}.");
+                        Connect();
+
+                        _modbus.Initialize(WriteReadDevice);
+
+                        IsConnected = true;
+                    }
+                    catch (Exception ex) {
+                        _log.Error(ex, $"{nameof(MonitorConnectionContinuously)} tried to connect to broker, but that did not work.");
+                    }
+
+                    await Task.Delay(500, cancelationToken);
+                }
+                await Task.Delay(10, cancelationToken);
+            }
         }
 
         private void Connect() {
