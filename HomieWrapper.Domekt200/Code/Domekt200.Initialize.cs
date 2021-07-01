@@ -11,8 +11,8 @@ namespace HomieWrapper {
 
             // General section.
             _device.UpdateNodeInfo("general", "General information", "no-type");
-            _actualState = _device.CreateHostEnumProperty(PropertyType.State, "general", "actual-state", "Actual state", new[] { "UNKNOWN", "OFF", "STARTING", "ON-AUTO", "ON-LOW", "ON-MEDIUM", "ON-HIGH" }, "OFF");
-            _targetState = _device.CreateHostEnumProperty(PropertyType.Command, "general", "target-state", "Target state", new[] { "OFF", "ON-AUTO", "ON-LOW", "ON-MEDIUM", "ON-HIGH" }, "OFF");
+            _actualState = _device.CreateHostChoiceProperty(PropertyType.State, "general", "actual-state", "Actual state", new[] { "UNKNOWN", "OFF", "STARTING", "ON-AUTO", "ON-LOW", "ON-MEDIUM", "ON-HIGH" }, "OFF");
+            _targetState = _device.CreateHostChoiceProperty(PropertyType.Command, "general", "target-state", "Target state", new[] { "OFF", "ON-AUTO", "ON-LOW", "ON-MEDIUM", "ON-HIGH" }, "OFF");
             _targetState.PropertyChanged += (sender, e) => {
                 switch (_targetState.Value) {
                     case "OFF":
@@ -60,32 +60,31 @@ namespace HomieWrapper {
                         break;
                 }
             };
-            _actualModbusConnectionState = _device.CreateHostEnumProperty(PropertyType.State, "general", "modbus-state", "Modbus state", new[] { "OK", "DISCONNECTED" });
+            _actualModbusConnectionState = _device.CreateHostChoiceProperty(PropertyType.State, "general", "modbus-state", "Modbus state", new[] { "OK", "DISCONNECTED" });
 
             // Ventilation section.
             _device.UpdateNodeInfo("ventilation", "Ventilation related properties", "no-type");
-            _actualVentilationLevelProperty = _device.CreateHostEnumProperty(PropertyType.State, "ventilation", "actual-level", "Actual level", new[] { "OFF", "LOW", "MEDIUM", "HIGH" });
+            _actualVentilationLevelProperty = _device.CreateHostChoiceProperty(PropertyType.State, "ventilation", "actual-level", "Actual level", new[] { "OFF", "LOW", "MEDIUM", "HIGH" });
 
             // Temperatures section.
             _device.UpdateNodeInfo("temperatures", "Various temperatures", "no-type");
-            _supplyAirTemperatureProperty = _device.CreateHostFloatProperty(PropertyType.State, "temperatures", "supply-air-temperature", "Supply air temperature", 16, "°C");
+            _supplyAirTemperatureProperty = _device.CreateHostNumberProperty(PropertyType.State, "temperatures", "supply-air-temperature", "Supply air temperature", 16, "°C");
 
             // System section.
             _device.UpdateNodeInfo("system", "System", "no-type");
-            _actualDateTimeProperty = _device.CreateHostStringProperty(PropertyType.State, "system", "date-time", "Current date ant time.", "");
-            _systemUptime = _device.CreateHostFloatProperty(PropertyType.State, "system", "uptime", "Uptime", 0, "h");
-            _disconnectCount = _device.CreateHostIntegerProperty(PropertyType.State, "system", "disconnect-count", "Modbus disconnect count");
+            _actualDateTimeProperty = _device.CreateHostTextProperty(PropertyType.State, "system", "date-time", "Current date ant time.", "");
+            _systemUptime = _device.CreateHostNumberProperty(PropertyType.State, "system", "uptime", "Uptime", 0, "h");
+            _disconnectCount = _device.CreateHostNumberProperty(PropertyType.State, "system", "disconnect-count", "Modbus disconnect count", decimalPlaces: 0);
 
             // Now starting up everything.
             Log.Info($"Initializing Homie entities.");
             _reliableModbus.Initialize(modBusIp);
-            _broker.PublishReceived += _device.HandlePublishReceived;
-            _broker.Initialize(brokerIp, _device.WillTopic, _device.WillPayload, (severity, message) => {
+            _broker.Initialize(brokerIp);
+            _device.Initialize(_broker, (severity, message) => {
                 if (severity == "Info") { Log.Info(message); }
                 else if (severity == "Error") { Log.Error(message); }
                 else { Log.Debug(message); }
             });
-            _device.Initialize(_broker.PublishToTopic, _broker.SubscribeToTopic);
 
             // Spinning up spinners.
             Task.Run(async () => await PollDomektOverModbusContinuouslyAsync(new CancellationToken()));
