@@ -7,7 +7,7 @@ namespace HomieWrapper {
     partial class Domekt200 {
         private HostDevice _device;
 
-        private IMqttBroker _broker = new PahoBroker();
+        private PahoHostDeviceConnection _broker = new PahoHostDeviceConnection();
         private ReliableModbus _reliableModbus = new ReliableModbus();
 
         HostTextProperty _actualDateTimeProperty;

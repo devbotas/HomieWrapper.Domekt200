@@ -79,7 +79,11 @@ namespace HomieWrapper {
             // Now starting up everything.
             Log.Info($"Initializing Homie entities.");
             _reliableModbus.Initialize(modBusIp);
-            _broker.Initialize(brokerIp);
+            _broker.Initialize(brokerIp, (severity, message) => {
+                if (severity == "Info") { Log.Info(message); }
+                else if (severity == "Error") { Log.Error(message); }
+                else { Log.Debug(message); }
+            });
             _device.Initialize(_broker, (severity, message) => {
                 if (severity == "Info") { Log.Info(message); }
                 else if (severity == "Error") { Log.Error(message); }
